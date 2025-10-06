@@ -211,8 +211,8 @@ function Trees() {
     let totalAttempts = 0;
     const maxTotalAttempts = 10000;
 
-    // Place 150 trees in the gaps between houses, spreading outward
-    for (let i = 0; i < 150 && totalAttempts < maxTotalAttempts; i++) {
+    // Place 75 trees in the gaps between houses, spreading outward
+    for (let i = 0; i < 75 && totalAttempts < maxTotalAttempts; i++) {
       let angle, radius, x, z;
       let validPosition = false;
       let attempts = 0;

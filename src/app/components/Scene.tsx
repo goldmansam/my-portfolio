@@ -949,7 +949,7 @@ export default function Scene() {
             <div style={{
               fontSize: '1.25rem',
               color: 'rgba(255, 255, 255, 0.9)',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: 'Gentilis, monospace',
               lineHeight: '1.8',
             }}>
               {activePage === 'work' && (

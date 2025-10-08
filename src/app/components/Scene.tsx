@@ -244,10 +244,14 @@ function Trees() {
       }
 
       if (validPosition) {
-        // Scale trees based on distance - closer trees smaller, far trees larger
+        // Natural size variation - much more varied for organic look
         const distance = Math.sqrt((x! - centerX) ** 2 + (z! - centerZ) ** 2);
         const scaleMultiplier = Math.max(1, distance / 50000); // Scale increases with distance
-        const baseScale = 3000 + Math.random() * 2000; // 3k-5k base
+
+        // Much wider range: 2k-6k base (instead of 3k-5k)
+        // Using power distribution for more variation (more small, some very large)
+        const randomFactor = Math.pow(Math.random(), 1.5); // Bias toward smaller
+        const baseScale = 2000 + randomFactor * 4000; // 2k-6k range
 
         trees.push({
           x: x!,
@@ -949,7 +953,7 @@ export default function Scene() {
             <div style={{
               fontSize: '1.25rem',
               color: 'rgba(255, 255, 255, 0.9)',
-              fontFamily: 'Gentilis, monospace',
+              fontFamily: 'Georgia, "Times New Roman", serif',
               lineHeight: '1.8',
             }}>
               {activePage === 'work' && (

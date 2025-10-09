@@ -941,7 +941,7 @@ export default function Scene() {
               marginBottom: '2rem',
               color: activePage === 'work' ? '#ff6b9d' : activePage === 'about' ? '#4ecdc4' : '#ffe66d',
               textTransform: 'uppercase',
-              fontFamily: 'Gentilis, monospace',
+              fontFamily: 'Georgia, "Times New Roman", serif',
               fontWeight: 'bold',
               textShadow: `0 0 30px ${activePage === 'work' ? '#ff6b9d' : activePage === 'about' ? '#4ecdc4' : '#ffe66d'},
                            0 0 60px ${activePage === 'work' ? '#ff6b9d' : activePage === 'about' ? '#4ecdc4' : '#ffe66d'}`,

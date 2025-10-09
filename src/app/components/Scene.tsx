@@ -668,11 +668,14 @@ function CameraAnimation({ targetZ, onComplete, maintainDirection }: { targetZ: 
         camera.position.x = startX.current + direction.x * distance * easeProgress;
         camera.position.z = startZ.current + direction.z * distance * easeProgress;
       } else {
-        // Only move Z position, keep X and Y constant, maintain camera view
+        // Only move Z position, keep X and Y constant
         camera.position.x = startX.current;
         camera.position.y = startY.current;
         camera.position.z = startZ.current + (targetZ - startZ.current) * easeProgress;
-        // Don't change camera rotation - it stays looking forward
+
+        // Set lookAt to match what manual rotation expects (centerY = 200)
+        camera.lookAt(0, 200, -1000);
+        camera.up.set(0, 1, 0);
       }
 
       if (progress < 1) {

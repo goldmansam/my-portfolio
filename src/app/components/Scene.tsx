@@ -272,11 +272,48 @@ function Trees() {
   return (
     <>
       {treePositions.map((pos, i) => (
-        <group key={`tree-${i}`} position={[pos.x, planeY, pos.z]} rotation={[0, pos.rotation, 0]} scale={pos.scale}>
-          <primitive object={pos.type === 'pine' ? pineTreeGltf.scene.clone() : stylizedTreeGltf.scene.clone()} />
-        </group>
+        <SwayingTree
+          key={`tree-${i}`}
+          position={[pos.x, planeY, pos.z]}
+          rotation={pos.rotation}
+          scale={pos.scale}
+          treeIndex={i}
+          model={pos.type === 'pine' ? pineTreeGltf.scene.clone() : stylizedTreeGltf.scene.clone()}
+        />
       ))}
     </>
+  );
+}
+
+function SwayingTree({ position, rotation, scale, treeIndex, model }: {
+  position: [number, number, number];
+  rotation: number;
+  scale: number;
+  treeIndex: number;
+  model: THREE.Object3D;
+}) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    const animate = () => {
+      if (groupRef.current) {
+        const time = Date.now() * 0.001;
+        // Gentle swaying motion - different phase for each tree
+        const swayAmount = 0.02; // Very subtle
+        const swayX = Math.sin(time * 0.5 + treeIndex * 0.1) * swayAmount;
+        const swayZ = Math.cos(time * 0.3 + treeIndex * 0.15) * swayAmount;
+        groupRef.current.rotation.x = swayX;
+        groupRef.current.rotation.z = swayZ;
+      }
+      requestAnimationFrame(animate);
+    };
+    animate();
+  }, [treeIndex]);
+
+  return (
+    <group ref={groupRef} position={position} rotation={[0, rotation, 0]} scale={scale}>
+      <primitive object={model} />
+    </group>
   );
 }
 
@@ -384,6 +421,132 @@ function RainbowParticles() {
   );
 }
 
+function Fireflies() {
+  const particlesRef = useRef<THREE.Points>(null);
+  const mousePos = useRef({ x: 0, y: 0 });
+  const count = 100;
+
+  const { positions: initialPositions, colors, sizes } = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      // Start spread around origin
+      positions[i * 3] = (Math.random() - 0.5) * 2000;
+      positions[i * 3 + 1] = Math.random() * 500 + 100;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+
+      // Warm firefly colors (yellow-orange)
+      const warmth = 0.7 + Math.random() * 0.3;
+      colors[i * 3] = 1.0; // R
+      colors[i * 3 + 1] = warmth; // G
+      colors[i * 3 + 2] = 0.2; // B
+
+      sizes[i] = Math.random() * 8 + 4;
+    }
+
+    return { positions, colors, sizes };
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      mousePos.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mousePos.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    if (particlesRef.current) {
+      const geometry = particlesRef.current.geometry;
+      geometry.setAttribute('position', new THREE.BufferAttribute(initialPositions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    }
+  }, [initialPositions, colors, sizes]);
+
+  useEffect(() => {
+    const animate = () => {
+      if (particlesRef.current) {
+        const positions = particlesRef.current.geometry.attributes.position.array as Float32Array;
+        const time = Date.now() * 0.001;
+
+        for (let i = 0; i < count; i++) {
+          // Gentle floating motion
+          positions[i * 3 + 1] += Math.sin(time + i * 0.1) * 0.3;
+
+          // Follow mouse cursor subtly
+          const targetX = mousePos.current.x * 1000;
+          const targetZ = mousePos.current.y * -1000;
+
+          positions[i * 3] += (targetX - positions[i * 3]) * 0.002;
+          positions[i * 3 + 2] += (targetZ - positions[i * 3 + 2]) * 0.002;
+        }
+
+        particlesRef.current.geometry.attributes.position.needsUpdate = true;
+      }
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+  }, []);
+
+  return (
+    <points ref={particlesRef}>
+      <bufferGeometry />
+      <pointsMaterial
+        size={8}
+        vertexColors
+        transparent
+        opacity={0.8}
+        sizeAttenuation
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        map={useMemo(() => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 32;
+          canvas.height = 32;
+          const ctx = canvas.getContext('2d')!;
+          const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+          gradient.addColorStop(0, 'rgba(255,255,255,1)');
+          gradient.addColorStop(0.4, 'rgba(255,220,100,0.8)');
+          gradient.addColorStop(1, 'rgba(255,200,50,0)');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, 32, 32);
+          const texture = new THREE.CanvasTexture(canvas);
+          return texture;
+        }, [])}
+      />
+    </points>
+  );
+}
+
+// Sound effect utility
+function playSound(frequency: number, duration: number, type: OscillatorType = 'sine') {
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = frequency;
+    oscillator.type = type;
+
+    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + duration);
+  } catch (e) {
+    // Silently fail if audio not supported
+  }
+}
+
 function InitialCameraSetup() {
   const { camera } = useThree();
 
@@ -408,9 +571,13 @@ function EnterText({ onClick, opacity }: { onClick: () => void; opacity: number 
         size={400}
         height={80}
         castShadow
-        onClick={onClick}
+        onClick={(e) => {
+          playSound(800, 0.3, 'sine'); // Whoosh sound
+          onClick();
+        }}
         onPointerOver={(e) => {
           document.body.style.cursor = 'pointer';
+          playSound(400, 0.1, 'sine'); // Hover sound
         }}
         onPointerOut={(e) => {
           document.body.style.cursor = 'default';
@@ -534,9 +701,13 @@ function PortfolioText({ onClick, opacity }: { onClick: () => void; opacity: num
         size={400}
         height={80}
         castShadow
-        onClick={onClick}
+        onClick={() => {
+          playSound(600, 0.3, 'triangle'); // Different sound for PORTFOLIO
+          onClick();
+        }}
         onPointerOver={(e) => {
           document.body.style.cursor = 'pointer';
+          playSound(300, 0.1, 'sine');
         }}
         onPointerOut={(e) => {
           document.body.style.cursor = 'default';
@@ -592,9 +763,13 @@ function ExpandingSpheres({ onWorkClick, onAboutClick, onContactClick }: {
             font="/fonts/gentilis_bold.typeface.json"
             size={240}
             height={40}
-            onClick={onWorkClick}
+            onClick={() => {
+              playSound(500, 0.2, 'square');
+              onWorkClick();
+            }}
             onPointerOver={() => {
               document.body.style.cursor = 'pointer';
+              playSound(250, 0.08, 'sine');
             }}
             onPointerOut={() => {
               document.body.style.cursor = 'default';
@@ -613,9 +788,13 @@ function ExpandingSpheres({ onWorkClick, onAboutClick, onContactClick }: {
             font="/fonts/gentilis_bold.typeface.json"
             size={240}
             height={40}
-            onClick={onAboutClick}
+            onClick={() => {
+              playSound(550, 0.2, 'square');
+              onAboutClick();
+            }}
             onPointerOver={() => {
               document.body.style.cursor = 'pointer';
+              playSound(275, 0.08, 'sine');
             }}
             onPointerOut={() => {
               document.body.style.cursor = 'default';
@@ -634,9 +813,13 @@ function ExpandingSpheres({ onWorkClick, onAboutClick, onContactClick }: {
             font="/fonts/gentilis_bold.typeface.json"
             size={240}
             height={40}
-            onClick={onContactClick}
+            onClick={() => {
+              playSound(450, 0.2, 'square');
+              onContactClick();
+            }}
             onPointerOver={() => {
               document.body.style.cursor = 'pointer';
+              playSound(225, 0.08, 'sine');
             }}
             onPointerOut={() => {
               document.body.style.cursor = 'default';
@@ -785,6 +968,7 @@ export default function Scene() {
           <FantasyHouses />
           <Trees />
           <RainbowParticles />
+          <Fireflies />
           {showEnter && <EnterText onClick={handleEnterClick} opacity={enterOpacity} />}
           {showPortfolio && <PortfolioText onClick={handlePortfolioClick} opacity={portfolioOpacity} />}
           {showSpheres && (

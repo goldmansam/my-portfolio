@@ -384,6 +384,18 @@ function RainbowParticles() {
   );
 }
 
+function InitialCameraSetup() {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    // Set initial camera lookAt to match what animation expects
+    camera.lookAt(0, 200, -3000);
+    camera.up.set(0, 1, 0);
+  }, [camera]);
+
+  return null;
+}
+
 function EnterText({ onClick, opacity }: { onClick: () => void; opacity: number }) {
   const gltf = useGLTF(MODEL_PATH);
   const box = useMemo(() => new THREE.Box3().setFromObject(gltf.scene), [gltf.scene]);
@@ -766,6 +778,7 @@ export default function Scene() {
     <>
       <Canvas shadows dpr={[1, 1.5]} camera={{ fov: 50, position: [0, 200, -6000], near: 1, far: 500000 }}>
         <Suspense fallback={null}>
+          <InitialCameraSetup />
           <Environment files={HDRI_PATH} background backgroundIntensity={0.15} environmentIntensity={0.3} />
 
           <MirroredBoundary />

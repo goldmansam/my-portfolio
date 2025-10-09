@@ -524,8 +524,8 @@ function Fireflies() {
   );
 }
 
-// Sound effect utility
-function playSound(frequency: number, duration: number, type: OscillatorType = 'sine') {
+// Gentle ambient sound effect utility
+function playSound(type: 'hover' | 'click') {
   try {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
@@ -534,14 +534,23 @@ function playSound(frequency: number, duration: number, type: OscillatorType = '
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    oscillator.frequency.value = frequency;
-    oscillator.type = type;
-
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+    if (type === 'hover') {
+      // Very gentle, soft chime
+      oscillator.frequency.value = 880; // A5 note
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.02, audioContext.currentTime); // Very quiet
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } else {
+      // Soft, pleasant whoosh/chime
+      oscillator.frequency.value = 660; // E5 note
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.04, audioContext.currentTime); // Quiet
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.6);
+      oscillator.stop(audioContext.currentTime + 0.6);
+    }
 
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + duration);
   } catch (e) {
     // Silently fail if audio not supported
   }
@@ -572,12 +581,12 @@ function EnterText({ onClick, opacity }: { onClick: () => void; opacity: number 
         height={80}
         castShadow
         onClick={(e) => {
-          playSound(800, 0.3, 'sine'); // Whoosh sound
+          playSound('click');
           onClick();
         }}
         onPointerOver={(e) => {
           document.body.style.cursor = 'pointer';
-          playSound(400, 0.1, 'sine'); // Hover sound
+          playSound('hover');
         }}
         onPointerOut={(e) => {
           document.body.style.cursor = 'default';
@@ -702,12 +711,12 @@ function PortfolioText({ onClick, opacity }: { onClick: () => void; opacity: num
         height={80}
         castShadow
         onClick={() => {
-          playSound(600, 0.3, 'triangle'); // Different sound for PORTFOLIO
+          playSound('click');
           onClick();
         }}
         onPointerOver={(e) => {
           document.body.style.cursor = 'pointer';
-          playSound(300, 0.1, 'sine');
+          playSound('hover');
         }}
         onPointerOut={(e) => {
           document.body.style.cursor = 'default';
@@ -764,12 +773,12 @@ function ExpandingSpheres({ onWorkClick, onAboutClick, onContactClick }: {
             size={240}
             height={40}
             onClick={() => {
-              playSound(500, 0.2, 'square');
+              playSound('click');
               onWorkClick();
             }}
             onPointerOver={() => {
               document.body.style.cursor = 'pointer';
-              playSound(250, 0.08, 'sine');
+              playSound('hover');
             }}
             onPointerOut={() => {
               document.body.style.cursor = 'default';
@@ -789,12 +798,12 @@ function ExpandingSpheres({ onWorkClick, onAboutClick, onContactClick }: {
             size={240}
             height={40}
             onClick={() => {
-              playSound(550, 0.2, 'square');
+              playSound('click');
               onAboutClick();
             }}
             onPointerOver={() => {
               document.body.style.cursor = 'pointer';
-              playSound(275, 0.08, 'sine');
+              playSound('hover');
             }}
             onPointerOut={() => {
               document.body.style.cursor = 'default';
@@ -814,12 +823,12 @@ function ExpandingSpheres({ onWorkClick, onAboutClick, onContactClick }: {
             size={240}
             height={40}
             onClick={() => {
-              playSound(450, 0.2, 'square');
+              playSound('click');
               onContactClick();
             }}
             onPointerOver={() => {
               document.body.style.cursor = 'pointer';
-              playSound(225, 0.08, 'sine');
+              playSound('hover');
             }}
             onPointerOut={() => {
               document.body.style.cursor = 'default';

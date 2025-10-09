@@ -486,7 +486,7 @@ function ManualCameraRotation({ enabled, centerZ }: { enabled: boolean; centerZ:
 
       camera.position.x = x;
       camera.position.z = z;
-      camera.position.y = 200;
+      camera.position.y = centerY;
 
       camera.lookAt(centerX, centerY, centerZ);
       camera.up.set(0, 1, 0);

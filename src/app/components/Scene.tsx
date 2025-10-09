@@ -434,7 +434,7 @@ function ManualCameraRotation({ enabled, centerZ }: { enabled: boolean; centerZ:
 
     const radius = 3000; // Distance from camera to text
     const centerX = 0;
-    const centerY = planeY + 200;
+    const centerY = 200; // Match initial camera Y to prevent glitch
     const maxSpeed = 0.03;
     const acceleration = 0.002;
     const deceleration = 0.001;

@@ -8,17 +8,17 @@ export default function AboutSection() {
 
         <div className="space-y-6 text-white/90">
           <p className="text-lg leading-relaxed">
-            Hi, I&apos;m [Your Name]. Add your introduction here - who you are, what you do, and what drives you.
+            Hi, I&apos;m Samuel Goldman. I&apos;m a developer passionate about creating immersive web experiences that blend creativity with cutting-edge technology.
           </p>
 
           <p className="text-lg leading-relaxed">
-            Write about your background, experience, and expertise. Share what makes you unique and passionate about your work.
+            I specialize in building interactive 3D environments and modern web applications. My approach combines technical precision with artistic vision, bringing ideas to life through code. Whether it&apos;s crafting dynamic visual experiences with Three.js or developing robust full-stack solutions, I&apos;m driven by the challenge of turning complex concepts into elegant, user-friendly interfaces.
           </p>
 
           <div className="mt-8">
             <h3 className="text-2xl font-semibold text-white mb-4">Skills</h3>
             <div className="flex flex-wrap gap-3">
-              {['Skill 1', 'Skill 2', 'Skill 3', 'Skill 4', 'Skill 5', 'Skill 6'].map((skill) => (
+              {['React', 'Three.js', 'Next.js', 'TypeScript', 'WebGL', '3D Graphics', 'Full-Stack Development', 'UI/UX Design'].map((skill) => (
                 <span
                   key={skill}
                   className="px-4 py-2 bg-white/20 rounded-full text-white text-sm"

@@ -897,11 +897,7 @@ function CameraAnimation({ targetZ, onComplete, maintainDirection }: { targetZ: 
   return null;
 }
 
-interface SceneProps {
-  onSectionChange?: (section: 'home' | 'work' | 'about' | 'contact') => void;
-}
-
-export default function Scene({ onSectionChange }: SceneProps = {}) {
+export default function Scene() {
   const [showEnter, setShowEnter] = useState(true);
   const [enterOpacity, setEnterOpacity] = useState(1);
   const [showPortfolio, setShowPortfolio] = useState(false);
@@ -988,18 +984,9 @@ export default function Scene({ onSectionChange }: SceneProps = {}) {
           {showPortfolio && <PortfolioText onClick={handlePortfolioClick} opacity={portfolioOpacity} />}
           {showSpheres && (
             <ExpandingSpheres
-              onWorkClick={() => {
-                setActivePage('work');
-                onSectionChange?.('work');
-              }}
-              onAboutClick={() => {
-                setActivePage('about');
-                onSectionChange?.('about');
-              }}
-              onContactClick={() => {
-                setActivePage('contact');
-                onSectionChange?.('contact');
-              }}
+              onWorkClick={() => setActivePage('work')}
+              onAboutClick={() => setActivePage('about')}
+              onContactClick={() => setActivePage('contact')}
             />
           )}
           {isAnimating && (
@@ -1183,31 +1170,39 @@ export default function Scene({ onSectionChange }: SceneProps = {}) {
               {activePage === 'work' && (
                 <div>
                   <p style={{ marginBottom: '1.5rem' }}>
-                    Add your work content here...
+                    Content to be filled.
                   </p>
                   <p style={{ marginBottom: '1.5rem' }}>
-                    Showcase your projects, portfolio pieces, and professional accomplishments.
+                    Check back soon for updates!
                   </p>
                 </div>
               )}
               {activePage === 'about' && (
                 <div>
                   <p style={{ marginBottom: '1.5rem' }}>
-                    Add your about content here...
+                    Hi, I&apos;m Samuel Goldman, a developer passionate about creating immersive web experiences with cutting-edge technology.
                   </p>
                   <p style={{ marginBottom: '1.5rem' }}>
-                    Tell your story, share your background, and let people know who you are.
+                    I specialize in building interactive 3D environments and modern web applications, combining technical precision with creative vision to bring ideas to life through code.
                   </p>
                 </div>
               )}
               {activePage === 'contact' && (
                 <div>
                   <p style={{ marginBottom: '1.5rem' }}>
-                    Add your contact content here...
+                    Please reach out for any inquiries.
                   </p>
-                  <p style={{ marginBottom: '1.5rem' }}>
-                    Share ways people can reach you - email, social media, or other platforms.
-                  </p>
+                  <div style={{ marginTop: '2rem' }}>
+                    <p style={{ marginBottom: '1rem' }}>
+                      <strong>Name:</strong> Samuel Goldman
+                    </p>
+                    <p style={{ marginBottom: '1rem' }}>
+                      <strong>Phone:</strong> <a href="tel:6464830840" style={{ color: '#4ecdc4' }}>(646) 483-0840</a>
+                    </p>
+                    <p style={{ marginBottom: '1rem' }}>
+                      <strong>Email:</strong> <a href="mailto:goldman.j.sam@gmail.com" style={{ color: '#4ecdc4' }}>goldman.j.sam@gmail.com</a>
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

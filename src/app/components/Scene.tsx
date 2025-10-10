@@ -897,11 +897,7 @@ function CameraAnimation({ targetZ, onComplete, maintainDirection }: { targetZ: 
   return null;
 }
 
-interface SceneProps {
-  onSectionChange?: (section: 'home' | 'work' | 'about' | 'contact') => void;
-}
-
-export default function Scene({ onSectionChange }: SceneProps = {}) {
+export default function Scene() {
   const [showEnter, setShowEnter] = useState(true);
   const [enterOpacity, setEnterOpacity] = useState(1);
   const [showPortfolio, setShowPortfolio] = useState(false);
@@ -988,18 +984,9 @@ export default function Scene({ onSectionChange }: SceneProps = {}) {
           {showPortfolio && <PortfolioText onClick={handlePortfolioClick} opacity={portfolioOpacity} />}
           {showSpheres && (
             <ExpandingSpheres
-              onWorkClick={() => {
-                setActivePage('work');
-                onSectionChange?.('work');
-              }}
-              onAboutClick={() => {
-                setActivePage('about');
-                onSectionChange?.('about');
-              }}
-              onContactClick={() => {
-                setActivePage('contact');
-                onSectionChange?.('contact');
-              }}
+              onWorkClick={() => setActivePage('work')}
+              onAboutClick={() => setActivePage('about')}
+              onContactClick={() => setActivePage('contact')}
             />
           )}
           {isAnimating && (

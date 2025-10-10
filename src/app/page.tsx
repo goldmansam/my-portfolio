@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <main className="w-screen h-screen overflow-hidden relative">
       {/* 3D Scene Background */}
-      <Scene />
+      <Scene onSectionChange={setCurrentSection} />
 
 
       {/* Section Overlays */}

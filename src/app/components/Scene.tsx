@@ -909,6 +909,7 @@ export default function Scene({ onSectionChange }: SceneProps = {}) {
   const [showSpheres, setShowSpheres] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationTarget, setAnimationTarget] = useState(-3000);
+  const [activePage, setActivePage] = useState<'work' | 'about' | 'contact' | null>(null);
   const [startRotation, setStartRotation] = useState(false);
   const [maintainDirection, setMaintainDirection] = useState(false);
   const [enableControls, setEnableControls] = useState(false);
@@ -987,9 +988,18 @@ export default function Scene({ onSectionChange }: SceneProps = {}) {
           {showPortfolio && <PortfolioText onClick={handlePortfolioClick} opacity={portfolioOpacity} />}
           {showSpheres && (
             <ExpandingSpheres
-              onWorkClick={() => onSectionChange?.('work')}
-              onAboutClick={() => onSectionChange?.('about')}
-              onContactClick={() => onSectionChange?.('contact')}
+              onWorkClick={() => {
+                setActivePage('work');
+                onSectionChange?.('work');
+              }}
+              onAboutClick={() => {
+                setActivePage('about');
+                onSectionChange?.('about');
+              }}
+              onContactClick={() => {
+                setActivePage('contact');
+                onSectionChange?.('contact');
+              }}
             />
           )}
           {isAnimating && (
@@ -1058,25 +1068,152 @@ export default function Scene({ onSectionChange }: SceneProps = {}) {
       <Loader />
 
       {/* Dynamic instruction prompt */}
-      <div style={{
-        position: 'fixed',
-        bottom: '2rem',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 40,
-        color: 'rgba(255, 255, 255, 0.9)',
-        fontSize: '1rem',
-        textAlign: 'center',
-        backdropFilter: 'blur(8px)',
-        backgroundColor: 'rgba(0, 0, 0, 0.2)',
-        padding: '0.75rem 1.5rem',
-        borderRadius: '9999px',
-        fontWeight: 500,
-      }}>
-        {showEnter && 'Click ENTER'}
-        {showPortfolio && 'Click PORTFOLIO • Use ← → arrow keys to rotate'}
-        {showSpheres && 'Click WORK, ABOUT, or CONTACT • Use ← → arrow keys to rotate'}
-      </div>
-</>
+      {!activePage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 40,
+          color: 'rgba(255, 255, 255, 0.9)',
+          fontSize: '1rem',
+          textAlign: 'center',
+          backdropFilter: 'blur(8px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          padding: '0.75rem 1.5rem',
+          borderRadius: '9999px',
+          fontWeight: 500,
+        }}>
+          {showEnter && 'Click ENTER'}
+          {showPortfolio && 'Click PORTFOLIO • Use ← → arrow keys to rotate'}
+          {showSpheres && 'Click WORK, ABOUT, or CONTACT • Use ← → arrow keys to rotate'}
+        </div>
+      )}
+
+      {/* Glass-morphism section overlays */}
+      {activePage && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2rem',
+            animation: 'fadeIn 0.5s ease-out',
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              maxWidth: '900px',
+              width: '100%',
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: `2px solid ${activePage === 'work' ? '#ff6b9d' : activePage === 'about' ? '#4ecdc4' : '#ffe66d'}`,
+              borderRadius: '24px',
+              padding: '3rem',
+              boxShadow: `0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                          0 0 60px ${activePage === 'work' ? 'rgba(255, 107, 157, 0.3)' : activePage === 'about' ? 'rgba(78, 205, 196, 0.3)' : 'rgba(255, 230, 109, 0.3)'}`,
+              maxHeight: '80vh',
+              overflowY: 'auto',
+            }}
+          >
+            <button
+              onClick={() => setActivePage(null)}
+              style={{
+                position: 'absolute',
+                top: '1.5rem',
+                right: '1.5rem',
+                width: '48px',
+                height: '48px',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '2px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                color: 'white',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.5rem',
+                transition: 'all 0.3s ease',
+                fontWeight: 'bold',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.transform = 'rotate(90deg)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.transform = 'rotate(0deg)';
+              }}
+            >
+              ✕
+            </button>
+
+            <h1 style={{
+              fontSize: '4rem',
+              marginBottom: '2rem',
+              color: activePage === 'work' ? '#ff6b9d' : activePage === 'about' ? '#4ecdc4' : '#ffe66d',
+              textTransform: 'uppercase',
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontWeight: 'bold',
+              textShadow: `0 0 30px ${activePage === 'work' ? '#ff6b9d' : activePage === 'about' ? '#4ecdc4' : '#ffe66d'},
+                           0 0 60px ${activePage === 'work' ? '#ff6b9d' : activePage === 'about' ? '#4ecdc4' : '#ffe66d'}`,
+              letterSpacing: '0.1em',
+            }}>
+              {activePage}
+            </h1>
+
+            <div style={{
+              fontSize: '1.25rem',
+              color: 'rgba(255, 255, 255, 0.9)',
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              lineHeight: '1.8',
+            }}>
+              {activePage === 'work' && (
+                <div>
+                  <p style={{ marginBottom: '1.5rem' }}>
+                    Add your work content here...
+                  </p>
+                  <p style={{ marginBottom: '1.5rem' }}>
+                    Showcase your projects, portfolio pieces, and professional accomplishments.
+                  </p>
+                </div>
+              )}
+              {activePage === 'about' && (
+                <div>
+                  <p style={{ marginBottom: '1.5rem' }}>
+                    Add your about content here...
+                  </p>
+                  <p style={{ marginBottom: '1.5rem' }}>
+                    Tell your story, share your background, and let people know who you are.
+                  </p>
+                </div>
+              )}
+              {activePage === 'contact' && (
+                <div>
+                  <p style={{ marginBottom: '1.5rem' }}>
+                    Add your contact content here...
+                  </p>
+                  <p style={{ marginBottom: '1.5rem' }}>
+                    Share ways people can reach you - email, social media, or other platforms.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
